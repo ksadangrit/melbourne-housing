@@ -4,6 +4,21 @@
 
 _Photo by Julia Foroni from [Pexels](https://www.pexels.com/photo/photo-of-assorted-colored-houses-4664660)_
 ## Introduction
+The Melbourne housing market presents a fascinating landscape of trends and patterns that can provide valuable insights for homeowners, investors, and policymakers alike. In this personal data analysis project, I aim to explore the dynamics of the Melbourne housing market using a dataset of property sales. 
+
+This property dataset had been extracted from Wikipage by Amal A Biju. Click [here](https://opendatacommons.org/licenses/dbcl/1-0/) to view the license. The dataset includes property sales data from Melbourne, including sale prices, property types, locations, and other relevant attributes.
+
+**Main objectives**
+
+* Identify trends in housing prices over time and space.
+* Explore the relationship between housing prices and key factors such as distance from the CBD, property type, and suburb.
+* Uncover any significant patterns or outliers in the data.
+* Provide insights and recommendations for homebuyers, sellers, investors and policy makers.
+
+Descriptive statistics and data visualization techniques will be used to explore the relationshop between housing prices and other factors. **R** is the tool that will be used for this analysis.
+
+## My analytical workflow
+
 
 ## Importing data
 We will download the dataset from [kaggle](https://www.kaggle.com/datasets/amalab182/property-salesmelbourne-city) ans save it into my computer file.
@@ -51,7 +66,7 @@ For full dictionary click [here](https://www.kaggle.com/datasets/amalab182/prope
 * `council_area`: Name of the local government area where the property is located
 
 
-## Cleaning data 
+## Cleaning data
 We'll start the cleaning step by checking how many rows there are in this dataset using the following code.
 ```
 nrow(melbourne_housing)
@@ -103,7 +118,7 @@ footscray_lot <- melbourne_housing %>%
 view(footscray_lot)
 ```
 
-There is only one row with `footscray_lot` suburb. It appears that this row was created with the incorrect suburb name as footscray lot suburb doesn't exist and this house address is in the footscry suburb. We'll then find the missing values from the rows with `footscray` suburb
+There is only one row with `footscray_lot` suburb. It appears that this row was created with the incorrect suburb name as Footscray lot suburb doesn't exist and this house address is in the Footscray suburb. We'll then find the missing values from the rows with `footscray` suburb
 
 ```
 # Find the missing values for our row by filtering in all the rows that have Footscray suburb
@@ -122,6 +137,7 @@ melbourne_housing <- melbourne_housing %>%
     propertycount = ifelse(row_number() == 14441, 7570, propertycount)
   )
 ```
+The other columns contain specific missing values which we cannot obtain based on the suburb names. 
 
 Next, we'll extract month and year from the date column deselect the columns that are not needed such as longtitude, latitude and the id. Well also rename some variables and columns to make them more readable. We'll name the clean dataset as `melbourne_housing_clean`.
 ```
@@ -151,6 +167,10 @@ A look into the clean dataset.
 ```
 glimpse(melbourne_housing_clean)
 ```
+
+## Analysis
+
+
 
 
 
