@@ -17,7 +17,7 @@ This property dataset had been extracted from Wikipage by Amal A Biju. Click [he
 
 Descriptive statistics and data visualization techniques will be used to explore the relationshop between housing prices and other factors. **R** is the tool that will be used for this analysis.
 
-## My analytical workflow
+### My analytical workflow
 
 
 ## Importing data
@@ -169,6 +169,7 @@ glimpse(melbourne_housing_clean)
 ```
 
 ## Analysis
+ 
 
 
 
