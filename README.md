@@ -169,7 +169,29 @@ glimpse(melbourne_housing_clean)
 ```
 
 ## Analysis
- 
+Taking a deep dive into Melbourne's housing market data, I want to get a clear picture of what's happening overall. To do this, we will crunch the numbers and summarize the key insights  such as max, min, average, median and standard deviation values into a handy table. This snapshot of the data gives a quick overview of the highs, lows, and averages, helping to make sense of the broader trends for each types of properties in the market. 
+
+### Max, Min, Avg, Median and Sd
+
+```
+sum_table <- melbourne_housing_clean %>% 
+  group_by(type) %>% 
+  summarise(max = comma(max(price)),
+            min = comma(min(price)),
+            avg = comma(mean(price)),
+            median = comma(median(price)),
+            sd = comma(sd(price)))
+```
+![Screen Shot 2024-03-12 at 1 00 13 PM](https://github.com/ksadangrit/melbourne-housing/assets/156267785/f3bf9e2d-e93e-422c-8f05-4f635e2bea09)
+
+From the table, we can see that the most expensive house sold in Melbourne is 2.49 times more than the most expensive apartment and 2.5 times more expensive than the most expensive townhouse. Surprisingly, the chapest townhouse is more expensive the the cheapest house and the cheapest apartment is only under $100,000 which is less than the cheapest townhouse and the cheapest house
+
+When we look at the average numbers and the median numbers, it is clear that all the average prices are higher than the median prices, this means that the data is generally **skewed right** and a few values are latger than the rest. The sd values also confirms this interpretation as they are all larger than $200,000.
+
+### 
+
+
+
 
 
 
