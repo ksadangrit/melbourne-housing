@@ -169,7 +169,9 @@ glimpse(melbourne_housing_clean)
 ```
 
 ## Analysis
-In this section, we will manipulate and analyze the data to gain a comprehensive understanding of the trends and patterns in the Melbourne housing market. Our objective is to explore the relationships between various factors and their impact on house prices. I will provide the code used for these calculations. While I will include results and visualizations where appropriate, the majority of findings will be presented through graphs or charts in the visualization stage of this project.
+In this section, we will manipulate and analyze the data to gain a comprehensive understanding of the trends and patterns in the Melbourne housing market. Our objective is to explore the relationships between various factors and their impact on house prices. In this analysis, my primary emphasis will be on evaluating total sales performance. While I will occasionally reference the total number of properties sold where relevant, it will not be as prominent as the discussion on sales performance.
+
+I will provide the code used for these calculations. While I will include results and visualizations where appropriate, the majority of findings will be presented through graphs or charts in the visualization stage of this project.
 
 ### Max, Min, Avg, Median and Sd
 Taking a deep dive into Melbourne's housing market data, I want to get a clear picture of what's happening overall. To do this, we will crunch the numbers and summarize the key insights  such as max, min, average, median and standard deviation values into a handy table. This snapshot of the data gives a quick overview of the highs, lows, and averages, helping to make sense of the broader trends for each types of properties in the market. 
@@ -242,6 +244,68 @@ avg_townhouse <- melbourne_housing_clean %>%
   head(10)
 ```
 
+### Council area
+Similar to the suburbs, we'll rank top 10 council area with the highest average price for different types of properties. We'll also rank all the council areas based on the total sales.
+### Total sales
+```
+council_sales <- melbourne_housing_clean %>% 
+  group_by(council_area) %>% 
+  filter(!is.na(council_area)) %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) %>%
+  arrange(desc(total_sales))
+```
+
+### Top 10 with the highest average house price
+```
+avg_house_council <- melbourne_housing_clean %>%
+  group_by(council_area) %>%
+  filter(type == "House", !is.na(council_area)) %>% 
+  summarise(avg_price = mean(price)) %>% 
+  arrange(desc(avg_price)) %>% 
+  head(10)
+```
+
+### Top 10 with the highest average apartment/unit price
+```
+avg_apartment_council <- melbourne_housing_clean %>%
+  group_by(council_area) %>%
+  filter(type == "Apartment/Unit", !is.na(council_area)) %>% 
+  summarise(avg_price = mean(price)) %>%
+  arrange(desc(avg_price)) %>% 
+  head(10)
+```
+
+### Top 10 with the highest average townhouse price
+```
+avg_townhouse_council <- melbourne_housing_clean %>%
+  group_by(council_area) %>%
+  filter(type == "Townhouse", !is.na(council_area)) %>% 
+  summarise(avg_price = mean(price)) %>%
+  arrange(desc(avg_price)) %>% 
+  head(10)
+```
+
+### Regions
+For regions, we'll calculate the total sales and the average price for different properties in each region.
+#### Total sales
+```
+region_sales <- melbourne_housing_clean %>% 
+  group_by(regionname) %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) %>%
+  arrange(desc(total_sales))
+```
+
+#### Average price
+We'll consolidate the average prices for different property types into a single dataframe. This will serve as the basis for creating graphs in the next section.
+
+```
+avg_region <- melbourne_housing_clean %>% 
+  group_by(regionname, type) %>% 
+  summarise(avg_price = mean(price)) 
+```
+
 ### Yearly
 We will employ various time measurements to analyze the sales data. To begin, we'll determine the total number of property sales and the number of properties sold in each year using the code provided below.
 
@@ -289,10 +353,61 @@ sales_month_type <- melbourne_housing_clean %>%
   summarise(total_sales = sum(price))
 ```
 
-### Regions
+### Sellers
+We'll initially rank all real estate agents or companies based on their overall sales performance and find out who are in the top 5. Then, we'll further rank them based on the total sales they made for each type of property.
 
+#### Top 5 for overall sales
+```
+sales_seller <- melbourne_housing_clean %>% 
+  group_by(seller) %>% 
+  summarise(total_sales = sum(price)) %>% 
+  arrange(desc(total_sales)) %>% 
+  head(5)
+```
 
+We'll also rank all sellers based on the total number of properties they sold to investigate potential variations in ranking.
+#### Top 5 based on number of properties sold
+```
+num_seller <- melbourne_housing_clean %>% 
+  group_by(seller) %>% 
+  summarise(number_sold = n()) %>% 
+  arrange(desc(number_sold)) %>% 
+  head(5)
+```
 
+The below rankings will be based on the sales for different types of properties only.
+#### Top 5 sellers for house
+```
+top_sellers_house <- melbourne_housing_clean %>% 
+  group_by(seller) %>% 
+  filter(type == "House") %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) %>% 
+  arrange(desc(total_sales)) %>% 
+  head(5)  
+```
+
+#### Top 5 sellers for apartment/unit
+```
+top_sellers_apartment <- melbourne_housing_clean %>% 
+  group_by(seller) %>% 
+  filter(type == "Apartment/Unit") %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) %>% 
+  arrange(desc(total_sales)) %>% 
+  head(5)
+```
+
+#### Top 5 sellers for townhouse
+```
+top_sellers_townhouse <- melbourne_housing_clean %>% 
+  group_by(seller) %>% 
+  filter(type == "Townhouse") %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) %>% 
+  arrange(desc(total_sales)) %>% 
+  head(5) 
+```
 
 
 
