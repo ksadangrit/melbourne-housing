@@ -169,9 +169,10 @@ glimpse(melbourne_housing_clean)
 ```
 
 ## Analysis
-Taking a deep dive into Melbourne's housing market data, I want to get a clear picture of what's happening overall. To do this, we will crunch the numbers and summarize the key insights  such as max, min, average, median and standard deviation values into a handy table. This snapshot of the data gives a quick overview of the highs, lows, and averages, helping to make sense of the broader trends for each types of properties in the market. 
+In this section, we will manipulate and analyze the data to gain a comprehensive understanding of the trends and patterns in the Melbourne housing market. Our objective is to explore the relationships between various factors and their impact on house prices. I will provide the code used for these calculations. While I will include results and visualizations where appropriate, the majority of findings will be presented through graphs or charts in the visualization stage of this project.
 
 ### Max, Min, Avg, Median and Sd
+Taking a deep dive into Melbourne's housing market data, I want to get a clear picture of what's happening overall. To do this, we will crunch the numbers and summarize the key insights  such as max, min, average, median and standard deviation values into a handy table. This snapshot of the data gives a quick overview of the highs, lows, and averages, helping to make sense of the broader trends for each types of properties in the market. 
 
 ```
 sum_table <- melbourne_housing_clean %>% 
@@ -188,8 +189,107 @@ From the table, we can see that the most expensive house sold in Melbourne is 2.
 
 When we look at the average numbers and the median numbers, it is clear that all the average prices are higher than the median prices, this means that the data is generally **skewed right** and a few values are latger than the rest. The sd values also confirms this interpretation as they are all larger than $200,000.
 
-### 
+### Most common types of properties 
+We'll find out the most common type of properties based on sales and total number using the below code.
+```
+# The most common type of houses sold in Melbourne
+house_types <- melbourne_housing_clean %>% 
+  group_by(type) %>% 
+  summarise(number = n(),
+            total_sales = sum(price))
+```
 
+We'll now separate the results by years to see if that makes any difference.
+```
+house_types_year <- melbourne_housing_clean %>% 
+  group_by(type, year) %>% 
+  summarise(number = n(),
+            total_sales = sum(price))
+```
+
+### Suburbs
+I opted to calculate the **average house price** for each suburb rather than median because despite potential outliers, it offers a more comprehensive reflection of suburb **desirability,** capturing the overall pricing trend across the area rather than focusing solely on a single central value. In the subsequent analysis, we'll compile a list of the top 10 suburbs with the highest average prices for each type of property.
+
+#### For Houses
+```
+# Top 10 suburbs with the highest house prices
+avg_house <- melbourne_housing_clean %>%
+  group_by(suburb) %>%
+  filter(type == "House") %>% 
+  summarise(avg_price = mean(price)) %>%
+  arrange(desc(avg_price)) %>% 
+  head(10)
+```
+#### For Apartment/ unit
+```
+# Top 10 suburbs with the highest apartment prices
+avg_apartment <- melbourne_housing_clean %>%
+  group_by(suburb) %>%
+  filter(type == "Apartment/Unit") %>% 
+  summarise(avg_price = mean(price)) %>%
+  arrange(desc(avg_price)) %>% 
+  head(10)
+```
+
+#### For Townhouse
+```
+# Top 10 suburbs with the highest townhouse prices
+avg_townhouse <- melbourne_housing_clean %>%
+  group_by(suburb) %>%
+  filter(type == "Townhouse") %>% 
+  summarise(avg_price = mean(price)) %>%
+  arrange(desc(avg_price)) %>% 
+  head(10)
+```
+
+### Yearly
+We will employ various time measurements to analyze the sales data. To begin, we'll determine the total number of property sales and the number of properties sold in each year using the code provided below.
+
+**Total sales and number of properties sold**
+```
+sales_year <- melbourne_housing_clean %>% 
+  group_by(year) %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price))
+```
+
+**The median price**
+
+We'll calculate the **median** price for each type of property in each year. I've opted for the median over the mean, particularly for time-based trends, as outliers with large values could distort the portrayal of the property market. This differs from our approach for suburb averages, which are area-based.
+```
+median_per_year <- melbourne_housing_clean %>% 
+  group_by(type, year) %>% 
+  summarise(median_price = median(price)) 
+```
+
+### Monthly
+We'll check out the total number of property sales and the number of properties sold in a monthly basis.
+```
+# Total number of properties sold and total sales per month 
+sales_month <- melbourne_housing_clean %>% 
+  group_by(month) %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) 
+```
+
+Instead of calculating the median house price for each month, we'll compare the **total sales** for each month. Since months represent a shorter time scale compared to years, variations in median house prices for each month may be influenced by factors such as housing market availability. Therefore, focusing on total sales can offer valuable insights into fluctuations in housing demand throughout the year.
+
+**Total sales and number of properties sold**
+```
+sales_month <- melbourne_housing_clean %>% 
+  group_by(month) %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) 
+```
+
+**Total sales separated by types**
+```
+sales_month_type <- melbourne_housing_clean %>% 
+  group_by(type, month) %>% 
+  summarise(total_sales = sum(price))
+```
+
+### Regions
 
 
 
