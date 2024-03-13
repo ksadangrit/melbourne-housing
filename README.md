@@ -461,6 +461,18 @@ Based on the results, houses with 1 to 3 rooms were the most common, making up o
 ## Visualising the findings
 For this part of the project, I will not include the codes used for creating visualisations but the full codes can be accessed in the melbourne_housing_complete.R file under the same repository. 
 
+## Yearly
+#### Total sales each year
+![sales_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/716c6f8f-5123-40ec-b5c8-6fbfb472d0e4)
+
+In 2017, sales outperformed 2016 by over 2 billion dollars.
+
+#### Number of house sold each year
+![total_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/d299cd3e-9c9f-440d-a44b-f9f5bff5a3a2)
+
+When examining the total number of houses sold each year, this bar chart provides further clarity on why 2017 outperformed 2016 in terms of sales. With over 2000 more properties sold in 2017 compared to 2016, it's logical that the sales figures would also be higher.
+
+### Yearly and type
 ### Most common type of houses based on sales 
 ![sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/cddc0ce3-6135-4150-8d71-10af4999a223)
 
@@ -474,12 +486,15 @@ Now, we'll break down the total sales by year to observe any changes in the tren
 
 ![type_sales_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/f727991d-7141-4675-99d1-4627bb01343b)
 
-The trend persists even after separating the total sales by year, with houses remaining the most purchased property type, followed by apartments and townhouses. Additionally, sales across all property types are generally higher in 2017 compared to 2016.
+The trend persists even after separating the total sales by year, with houses remaining the most purchased property type, followed by apartments and townhouses. Additionally, sales across all property types are generally higher in 2017 compared to 2016. This can be attributed to the notable increase in the number of properties sold in 2017 compared to 2016.
 
-### Total number sold each year
-![total_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/d299cd3e-9c9f-440d-a44b-f9f5bff5a3a2)
+#### Median house price
+![med_price_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/b562ce9a-a575-4d80-a342-cd746063ad9d)
 
-When examining the total number of houses sold each year, this bar chart provides further clarity on why 2017 outperformed 2016 in terms of sales. With over 2000 more properties sold in 2017 compared to 2016, it's logical that the sales figures would also be higher.
+
+
+
+
 
 
 
