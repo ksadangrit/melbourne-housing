@@ -209,6 +209,53 @@ house_types_year <- melbourne_housing_clean %>%
             total_sales = sum(price))
 ```
 
+### Yearly
+We will employ various time measurements to analyze the sales data. To begin, we'll determine the total number of property sales and the number of properties sold in each year using the code provided below.
+
+**Total sales and number of properties sold**
+```
+sales_year <- melbourne_housing_clean %>% 
+  group_by(year) %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price))
+```
+
+**The median price**
+
+We'll calculate the **median** price for each type of property in each year. I've opted for the median over the mean, particularly for time-based trends, as outliers with large values could distort the portrayal of the property market. This differs from our approach for suburb averages, which are area-based.
+```
+median_per_year <- melbourne_housing_clean %>% 
+  group_by(type, year) %>% 
+  summarise(median_price = median(price)) 
+```
+
+### Monthly
+We'll check out the total number of property sales and the number of properties sold in a monthly basis.
+```
+# Total number of properties sold and total sales per month 
+sales_month <- melbourne_housing_clean %>% 
+  group_by(month) %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) 
+```
+
+Instead of calculating the median house price for each month, we'll compare the **total sales** for each month. Since months represent a shorter time scale compared to years, variations in median house prices for each month may be influenced by factors such as housing market availability. Therefore, focusing on total sales can offer valuable insights into fluctuations in housing demand throughout the year.
+
+**Total sales and number of properties sold**
+```
+sales_month <- melbourne_housing_clean %>% 
+  group_by(month) %>% 
+  summarise(number_sold = n(),
+            total_sales = sum(price)) 
+```
+
+**Total sales separated by types**
+```
+sales_month_type <- melbourne_housing_clean %>% 
+  group_by(type, month) %>% 
+  summarise(total_sales = sum(price))
+```
+
 ### Suburbs
 I opted to calculate the **average house price** for each suburb rather than median because despite potential outliers, it offers a more comprehensive reflection of suburb **desirability,** capturing the overall pricing trend across the area rather than focusing solely on a single central value. In the subsequent analysis, we'll compile a list of the top 10 suburbs with the highest average prices for each type of property.
 
@@ -306,53 +353,6 @@ avg_region <- melbourne_housing_clean %>%
   summarise(avg_price = mean(price)) 
 ```
 
-### Yearly
-We will employ various time measurements to analyze the sales data. To begin, we'll determine the total number of property sales and the number of properties sold in each year using the code provided below.
-
-**Total sales and number of properties sold**
-```
-sales_year <- melbourne_housing_clean %>% 
-  group_by(year) %>% 
-  summarise(number_sold = n(),
-            total_sales = sum(price))
-```
-
-**The median price**
-
-We'll calculate the **median** price for each type of property in each year. I've opted for the median over the mean, particularly for time-based trends, as outliers with large values could distort the portrayal of the property market. This differs from our approach for suburb averages, which are area-based.
-```
-median_per_year <- melbourne_housing_clean %>% 
-  group_by(type, year) %>% 
-  summarise(median_price = median(price)) 
-```
-
-### Monthly
-We'll check out the total number of property sales and the number of properties sold in a monthly basis.
-```
-# Total number of properties sold and total sales per month 
-sales_month <- melbourne_housing_clean %>% 
-  group_by(month) %>% 
-  summarise(number_sold = n(),
-            total_sales = sum(price)) 
-```
-
-Instead of calculating the median house price for each month, we'll compare the **total sales** for each month. Since months represent a shorter time scale compared to years, variations in median house prices for each month may be influenced by factors such as housing market availability. Therefore, focusing on total sales can offer valuable insights into fluctuations in housing demand throughout the year.
-
-**Total sales and number of properties sold**
-```
-sales_month <- melbourne_housing_clean %>% 
-  group_by(month) %>% 
-  summarise(number_sold = n(),
-            total_sales = sum(price)) 
-```
-
-**Total sales separated by types**
-```
-sales_month_type <- melbourne_housing_clean %>% 
-  group_by(type, month) %>% 
-  summarise(total_sales = sum(price))
-```
-
 ### Sellers
 We'll initially rank all real estate agents or companies based on their overall sales performance and find out who are in the top 5. Then, we'll further rank them based on the total sales they made for each type of property.
 
@@ -408,6 +408,80 @@ top_sellers_townhouse <- melbourne_housing_clean %>%
   arrange(desc(total_sales)) %>% 
   head(5) 
 ```
+
+### Method
+#### Most common selling method based on the total sales
+```
+method_sales <- melbourne_housing_clean %>% 
+  group_by(method) %>% 
+  summarise(total_sales = sum(price))
+```
+
+#### Total sales based on types 
+```
+method_sales2 <- melbourne_housing_clean %>% 
+  group_by(method, type) %>% 
+  summarise(number = n(),
+            total_sales = sum(price))
+```
+
+### Property Count
+We'll create a dataframe that includes all suburbs along with the counts of properties and houses sold within each suburb. This dataframe will serve as the basis for creating visualizations in the next section.
+```
+count_suburb <- melbourne_housing_clean %>% 
+  group_by(suburb, propertycount) %>% 
+  count() %>% 
+  rename(total = n) %>% 
+  arrange(desc(total))
+```
+
+### Rooms
+We'll calculate the percentage of houses sold based on the number of rooms they possess. This analysis will shed light on the most common number of rooms among the houses sold in the market.
+```
+rooms <- melbourne_housing_clean %>%
+  mutate(condition = case_when(
+    rooms <= 3 ~ "<= 3",
+    rooms > 3 & rooms <= 6 ~ "3 < and <= 6",
+    rooms > 6 & rooms <= 9 ~ "6 < and <= 9",
+    rooms > 9 ~ "> 9",
+    TRUE ~ "Other"
+  )) %>%
+  group_by(condition) %>%
+  summarise(
+    count = n(),
+    percentage = round((n() / nrow(melbourne_housing_clean)) * 100,2)
+  )
+```
+
+![Screen Shot 2024-03-13 at 2 32 01 PM](https://github.com/ksadangrit/melbourne-housing/assets/156267785/af4bfc60-7933-4c14-b396-c7c6e0d7d2ac)
+
+Based on the results, houses with 1 to 3 rooms were the most common, making up over 75.31% of the total houses sold between 2016-2017. Conversely, the number of houses sold decreased as the number of rooms increased. This pattern might be because the market availability tends to be opposite to the number of rooms in the houses.
+
+
+## Visualising the findings
+For this part of the project, I will not include the codes used for creating visualisations but the full codes can be accessed in the melbourne_housing_complete.R file under the same repository. 
+
+### Most common type of houses based on sales 
+![sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/cddc0ce3-6135-4150-8d71-10af4999a223)
+
+### Based on total number
+![total01](https://github.com/ksadangrit/melbourne-housing/assets/156267785/57cf89a9-4d73-4208-b5c0-827351570e33)
+
+In Melbourne during 2016-2017, houses were the most commonly sold property type, making up about 77% of total sales and total number of properties sold. Apartments/units followed at 14%, and townhouses at 10%. The number of houses sold was nearly double that of apartments/units and townhouses combined.
+
+### Based on sales separated by year
+Now, we'll break down the total sales by year to observe any changes in the trend.
+
+![type_sales_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/f727991d-7141-4675-99d1-4627bb01343b)
+
+The trend persists even after separating the total sales by year, with houses remaining the most purchased property type, followed by apartments and townhouses. Additionally, sales across all property types are generally higher in 2017 compared to 2016.
+
+### Total number sold each year
+![total_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/d299cd3e-9c9f-440d-a44b-f9f5bff5a3a2)
+
+When examining the total number of houses sold each year, this bar chart provides further clarity on why 2017 outperformed 2016 in terms of sales. With over 2000 more properties sold in 2017 compared to 2016, it's logical that the sales figures would also be higher.
+
+
 
 
 
