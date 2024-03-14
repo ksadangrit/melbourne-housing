@@ -491,9 +491,77 @@ The trend persists even after separating the total sales by year, with houses re
 | --------------------------------------------- | --------------------------------------------- |
 | ![Median Price](https://github.com/ksadangrit/melbourne-housing/assets/156267785/b562ce9a-a575-4d80-a342-cd746063ad9d) | ![Average Price](https://github.com/ksadangrit/melbourne-housing/assets/156267785/d5cede3b-704a-442e-8202-19626b7aa816) |
 
+* Average prices for each property type exceeded the respective median prices in both years.
+* Houses consistently exhibited the highest average and median prices, followed by townhouses and apartment/units.
+* Average prices were generally higher in 2016 compared to 2017 across all property types.
+* The difference between average and median values was largest for houses, followed by townhouses and apartment/units.
 
+## Monthly
+**Sales by month**
+![sales_month](https://github.com/ksadangrit/melbourne-housing/assets/156267785/58c07d3e-73d8-440d-9ab3-7d5b69a3da25)
 
+The sales of houses showed a consistent pattern of being generally high from April to September. Total sales across all properties reached their lowest point in January. From January onwards, sales gradually increased, with the highest sales volume occurring in September, totaling around $3.4 billion. However, there was a significant drop in sales between September and October, with a difference of almost $2 billion.
 
+**Sales and Total number seperated by type and month**
+
+Now, we'll compare the total number of houses sold and the total sales for each month of the year, categorized by property type.
+![sales_month_type](https://github.com/ksadangrit/melbourne-housing/assets/156267785/4caacc1f-c6b7-496b-8f5f-b09a35b2b0ac)
+
+![total_month_type](https://github.com/ksadangrit/melbourne-housing/assets/156267785/6b998b9e-3407-416a-931d-ca2adade56ad)
+
+* The graphs illustrate a consistent trend across all three property types, with houses leading in both sales numbers and total properties sold, followed by apartments and townhouses.
+* This trend reflects the pattern observed in the total sales from all property types.
+* September stands out as the month with the highest sales and total number of properties sold across all property types.
+* However, houses show more pronounced fluctuations in sales, with distinct peaks and troughs, while apartments and townhouses exhibit similar but less dramatic changes over time.
+
+## Suburbs
+In this section, we'll identify and rank the top 10 different types of properties based on their average prices.
+
+### Top 10 suburbs for House
+![top_suburb_house](https://github.com/ksadangrit/melbourne-housing/assets/156267785/e6ed559b-5226-4b73-92e5-ec8ab192f522)
+
+### Top 10 suburbs for Apartment/ Unit
+![top_council_apartment](https://github.com/ksadangrit/melbourne-housing/assets/156267785/328a97a0-eb63-41b2-9f3d-6e21399520d8)
+
+### Top 10 suburbs for Townhouse
+![top_council_townhouse](https://github.com/ksadangrit/melbourne-housing/assets/156267785/7e069112-d219-431c-997e-659fde467afc)
+
+* None of the suburbs listed for houses appear on the top 10 list for apartments or townhouses. Notably, even the lowest average house price among these suburbs exceeds the highest average price for other property types.
+* Bayside ranks first for both apartments and townhouses. Furthermore, all suburbs listed for apartments also appear on the townhouse list.
+* Manningham, Melbourne, Whitehorse, and Monash rank higher for apartments but lower for townhouses. Conversely, suburbs ranking higher for townhouses include Stonington, Boroondara, Port Phillip, Yarra, and Glen Eira. Additionally, the average apartment prices across all suburbs are generally lower than the average prices for townhouses in the same suburbs.
+
+## Regions 
+**Sales by region**
+![sales_region](https://github.com/ksadangrit/melbourne-housing/assets/156267785/8e0e1391-c4be-4d6e-944f-5a84cfecf1c9)
+
+* Metropolitan regions generally have large total sales, with Southern Metropolitan topping the list at over $8.6 billion, followed by Northern Metropolitan and Western Metropolitan.
+* The Victoria region had the lowest sales overall, with Western Victoria recording the lowest sales of around $16.5 million.
+* Among the Metropolitan regions, South-Eastern Metropolitan was the only one with less than $1 billion in sales.
+
+**Average house price by region**
+Now, let's examine the average house prices for different regions based on property types.
+![avg_region](https://github.com/ksadangrit/melbourne-housing/assets/156267785/b2f962f1-1191-4101-a9f0-4ee9c1e01824)
+
+* No sales records are available in our data for townhouses and apartments in Northern Victoria and Western Victoria.
+* Average house prices exceed those of townhouses and apartments in every region.
+* Southern Metropolitan continues to have the highest sales across all property types.
+* Interestingly, Eastern outperforms Northern Metropolitan to become the region with the second-highest average property prices.
+* There is a more significant disparity in average house prices across different regions compared to apartments and townhouses, as evidenced by Southern Metropolitan having an average house price more than three times higher than that of Western Victoria.
+
+## Council 
+We'll examine the total sales and rank the top 10 based on the average house prices for different types of properties by council area.
+
+**Total sales**
+![council_sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/67ba3380-e124-4333-ba4e-083590d42cf4)
+
+**Top 10 for House**
+![top_council_house](https://github.com/ksadangrit/melbourne-housing/assets/156267785/85aca869-3158-4583-9486-cdeec6b39019)
+
+**Top 10 for Apartment/Unit**
+![top_council_apartment](https://github.com/ksadangrit/melbourne-housing/assets/156267785/5272c2da-1928-40dd-9d41-7b27c85a787e)
+
+**Top 10 for Townhouse**
+![top_council_townhouse](https://github.com/ksadangrit/melbourne-housing/assets/156267785/8a74538c-5129-44ab-b419-41f3135e7d6d)
 
 
 
