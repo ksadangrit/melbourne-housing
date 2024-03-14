@@ -220,13 +220,14 @@ sales_year <- melbourne_housing_clean %>%
             total_sales = sum(price))
 ```
 
-**The median price**
+In the previous part, we found the average and middle prices for each property type. Now, we'll split the data by year and compare how the average and middle prices differ. This comparison will help us understand how the data is spread out. We'll use this information for our next step in visualizing the data.
 
-We'll calculate the **median** price for each type of property in each year. I've opted for the median over the mean, particularly for time-based trends, as outliers with large values could distort the portrayal of the property market. This differs from our approach for suburb averages, which are area-based.
+**Average and Median price**
 ```
-median_per_year <- melbourne_housing_clean %>% 
+sum_per_year <- melbourne_housing_clean %>% 
   group_by(type, year) %>% 
-  summarise(median_price = median(price)) 
+  summarise(median_price = median(price),
+            avg_price = mean(price)) 
 ```
 
 ### Monthly
@@ -462,22 +463,19 @@ Based on the results, houses with 1 to 3 rooms were the most common, making up o
 For this part of the project, I will not include the codes used for creating visualisations but the full codes can be accessed in the melbourne_housing_complete.R file under the same repository. 
 
 ## Yearly
-#### Total sales each year
-![sales_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/716c6f8f-5123-40ec-b5c8-6fbfb472d0e4)
+#### Total sales each year and total number sold
+| Total sales                           | Number of properties sold                       |
+| ------------------------------------- | ----------------------------------------------- |
+| ![sales_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/3f2fffb9-50dc-4773-9277-b45cb38af794)| ![total_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/d299cd3e-9c9f-440d-a44b-f9f5bff5a3a2) |
 
-In 2017, sales outperformed 2016 by over 2 billion dollars.
-
-#### Number of house sold each year
-![total_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/d299cd3e-9c9f-440d-a44b-f9f5bff5a3a2)
-
-When examining the total number of houses sold each year, this bar chart provides further clarity on why 2017 outperformed 2016 in terms of sales. With over 2000 more properties sold in 2017 compared to 2016, it's logical that the sales figures would also be higher.
+In 2017, sales outperformed 2016 by over 2 billion dollars. When examining the total number of houses sold each year, this bar chart provides further clarity on why 2017 outperformed 2016 in terms of sales. With over 2000 more properties sold in 2017 compared to 2016, it's logical that the sales figures would also be higher.
 
 ### Yearly and type
-### Most common type of houses based on sales 
-![sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/cddc0ce3-6135-4150-8d71-10af4999a223)
+### Most common type of houses based on sales and total number
+| Total sales                           | Number of properties sold                       |
+| ------------------------------------- | ----------------------------------------------- |
+| ![sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/ae3b4ddb-0c19-4939-bf2f-01c4d4016674)| ![total](https://github.com/ksadangrit/melbourne-housing/assets/156267785/04ea5402-8fcf-4639-8135-fa2d8ff1bc65) |
 
-### Based on total number
-![total01](https://github.com/ksadangrit/melbourne-housing/assets/156267785/57cf89a9-4d73-4208-b5c0-827351570e33)
 
 In Melbourne during 2016-2017, houses were the most commonly sold property type, making up about 77% of total sales and total number of properties sold. Apartments/units followed at 14%, and townhouses at 10%. The number of houses sold was nearly double that of apartments/units and townhouses combined.
 
@@ -488,8 +486,12 @@ Now, we'll break down the total sales by year to observe any changes in the tren
 
 The trend persists even after separating the total sales by year, with houses remaining the most purchased property type, followed by apartments and townhouses. Additionally, sales across all property types are generally higher in 2017 compared to 2016. This can be attributed to the notable increase in the number of properties sold in 2017 compared to 2016.
 
-#### Median house price
-![med_price_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/b562ce9a-a575-4d80-a342-cd746063ad9d)
+### Median vs Average house price 
+| Median Price by Year                           | Average Price by Year                         |
+| --------------------------------------------- | --------------------------------------------- |
+| ![Median Price](https://github.com/ksadangrit/melbourne-housing/assets/156267785/b562ce9a-a575-4d80-a342-cd746063ad9d) | ![Average Price](https://github.com/ksadangrit/melbourne-housing/assets/156267785/d5cede3b-704a-442e-8202-19626b7aa816) |
+
+
 
 
 
