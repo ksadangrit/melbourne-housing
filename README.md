@@ -533,6 +533,13 @@ Next, we'll examine the top 5 sellers with the highest sales for different types
 ### Top 5 sellers for Townhouse
 ![seller_townhouse](https://github.com/ksadangrit/melbourne-housing/assets/156267785/fdca9aea-87ed-45e5-a72a-bacadd74f516)
 
+* The top 5 sellers for houses closely resemble the list of top 5 sellers for total sales we previously discussed, indicating that house sales significantly contribute to the overall ranking.
+* Surprisingly, Hockingstuart surpassed Jellis and Nelson to rank 1 for apartments, with Buxton also making it to the top 5 sellers for apartments.
+* Jellis ranks 1st for townhouses, followed by Buxton and Nelson.
+* Barry, Buxton, and Marshall are among the top 5 sellers for 2 out of 3 types of properties, while Jellis, Nelson, and Hockingstuart are the top sellers for all types.
+* The total sales from the top-ranked seller for apartments and townhouses are still lower than the total sales made by the rank 5 seller for houses.
+
+## Method
 
 
 
