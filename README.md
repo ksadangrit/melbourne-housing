@@ -292,48 +292,6 @@ avg_townhouse <- melbourne_housing_clean %>%
   head(10)
 ```
 
-### Council area
-Similar to the suburbs, we'll rank top 10 council area with the highest average price for different types of properties. We'll also rank all the council areas based on the total sales.
-### Total sales
-```
-council_sales <- melbourne_housing_clean %>% 
-  group_by(council_area) %>% 
-  filter(!is.na(council_area)) %>% 
-  summarise(number_sold = n(),
-            total_sales = sum(price)) %>%
-  arrange(desc(total_sales))
-```
-
-### Top 10 with the highest average house price
-```
-avg_house_council <- melbourne_housing_clean %>%
-  group_by(council_area) %>%
-  filter(type == "House", !is.na(council_area)) %>% 
-  summarise(avg_price = mean(price)) %>% 
-  arrange(desc(avg_price)) %>% 
-  head(10)
-```
-
-### Top 10 with the highest average apartment/unit price
-```
-avg_apartment_council <- melbourne_housing_clean %>%
-  group_by(council_area) %>%
-  filter(type == "Apartment/Unit", !is.na(council_area)) %>% 
-  summarise(avg_price = mean(price)) %>%
-  arrange(desc(avg_price)) %>% 
-  head(10)
-```
-
-### Top 10 with the highest average townhouse price
-```
-avg_townhouse_council <- melbourne_housing_clean %>%
-  group_by(council_area) %>%
-  filter(type == "Townhouse", !is.na(council_area)) %>% 
-  summarise(avg_price = mean(price)) %>%
-  arrange(desc(avg_price)) %>% 
-  head(10)
-```
-
 ### Regions
 For regions, we'll calculate the total sales and the average price for different properties in each region.
 #### Total sales
@@ -353,6 +311,9 @@ avg_region <- melbourne_housing_clean %>%
   group_by(regionname, type) %>% 
   summarise(avg_price = mean(price)) 
 ```
+
+_**Note**: I won't be analyzing the council area as a factor because a large portion of the data is missing, with 33% of the dataset lacking information. This could affect the accuracy of the analysis. Additionally, analyzing the council area is unlikely to yield significant insights insights for those interested in the property market._
+
 
 ### Sellers
 We'll initially rank all real estate agents or companies based on their overall sales performance and find out who are in the top 5. Then, we'll further rank them based on the total sales they made for each type of property.
@@ -548,23 +509,29 @@ Now, let's examine the average house prices for different regions based on prope
 * Interestingly, Eastern outperforms Northern Metropolitan to become the region with the second-highest average property prices.
 * There is a more significant disparity in average house prices across different regions compared to apartments and townhouses, as evidenced by Southern Metropolitan having an average house price more than three times higher than that of Western Victoria.
 
-## Council 
-We'll examine the total sales and rank the top 10 based on the average house prices for different types of properties by council area.
+## Sellers
+We'll begin by ranking the top 5 sellers across all types of properties based on sales and the number of properties sold to explore their relationships and differences.
+| Total sales                           | Number of properties sold                       |
+| --------------------------------------------- | --------------------------------------------- |
+| ![sales_seller](https://github.com/ksadangrit/melbourne-housing/assets/156267785/f42357c9-c751-4e01-b3af-cca7e3489f64)| ![total_seller](https://github.com/ksadangrit/melbourne-housing/assets/156267785/c6a3f797-f7ca-4057-931d-c5a13d0fbc1e)|
 
-**Total sales**
-![council_sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/67ba3380-e124-4333-ba4e-083590d42cf4)
+* Jellis, Nelson, Hockingstuart, and Barry appear in the top 5 list for both criteria.
+* Jellis ranks highest in sales but is 2nd in total number of properties sold, whereas Nelson has sold more houses but ranks 2nd in sales.
+* Marshall ranks 3rd for sales but is not in the top 5 for total number of properties sold.
+* Hockingstuart and Barry rank 1 position lower in sales compared to their ranks in total number of properties sold.
+* Ray is not in the top 5 list for sales but ranks 5th for total number of properties sold.
+* The differences between each rank in the top 5 are consistent, with no drastic variations observed.
 
-**Top 10 for House**
-![top_council_house](https://github.com/ksadangrit/melbourne-housing/assets/156267785/85aca869-3158-4583-9486-cdeec6b39019)
+Next, we'll examine the top 5 sellers with the highest sales for different types of properties to determine if any sellers dominate the Melbourne housing market or specialize in certain types of properties.
 
-**Top 10 for Apartment/Unit**
-![top_council_apartment](https://github.com/ksadangrit/melbourne-housing/assets/156267785/5272c2da-1928-40dd-9d41-7b27c85a787e)
+### Top 5 sellers for House
+![seller_house](https://github.com/ksadangrit/melbourne-housing/assets/156267785/406b73e5-0440-487c-a367-3f65001b8b43)
 
-**Top 10 for Townhouse**
-![top_council_townhouse](https://github.com/ksadangrit/melbourne-housing/assets/156267785/8a74538c-5129-44ab-b419-41f3135e7d6d)
+### Top 5 Sellers for Apartment/ Unit
+![seller_apartment](https://github.com/ksadangrit/melbourne-housing/assets/156267785/9e4252ff-24de-40ad-b2d3-435a56035207)
 
-
-
+### Top 5 sellers for Townhouse
+![seller_townhouse](https://github.com/ksadangrit/melbourne-housing/assets/156267785/fdca9aea-87ed-45e5-a72a-bacadd74f516)
 
 
 
