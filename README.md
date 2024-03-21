@@ -492,14 +492,14 @@ In this section, we'll identify and rank the top 10 different types of propertie
 * Manningham, Melbourne, Whitehorse, and Monash rank higher for apartments but lower for townhouses. Conversely, suburbs ranking higher for townhouses include Stonington, Boroondara, Port Phillip, Yarra, and Glen Eira. Additionally, the average apartment prices across all suburbs are generally lower than the average prices for townhouses in the same suburbs.
 
 ## Regions 
-**Sales by region**
+### Sales by region
 ![sales_region](https://github.com/ksadangrit/melbourne-housing/assets/156267785/8e0e1391-c4be-4d6e-944f-5a84cfecf1c9)
 
 * Metropolitan regions generally have large total sales, with Southern Metropolitan topping the list at over $8.6 billion, followed by Northern Metropolitan and Western Metropolitan.
 * The Victoria region had the lowest sales overall, with Western Victoria recording the lowest sales of around $16.5 million.
 * Among the Metropolitan regions, South-Eastern Metropolitan was the only one with less than $1 billion in sales.
 
-**Average house price by region**
+### Average house price by region
 Now, let's examine the average house prices for different regions based on property types.
 ![avg_region](https://github.com/ksadangrit/melbourne-housing/assets/156267785/b2f962f1-1191-4101-a9f0-4ee9c1e01824)
 
@@ -540,8 +540,25 @@ Next, we'll examine the top 5 sellers with the highest sales for different types
 * The total sales from the top-ranked seller for apartments and townhouses are still lower than the total sales made by the rank 5 seller for houses.
 
 ## Method
+| Total sales                           | Number of properties sold                       |
+| --------------------------------------------- | --------------------------------------------- |
+| ![method_sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/71be72dc-fe3f-44ea-9c83-6c2da4a755ee) | ![method_total](https://github.com/ksadangrit/melbourne-housing/assets/156267785/0ed4aa86-6f5e-4dff-b7b5-c787e07ffde7)|
 
+* Over 65% of Melbourne houses were sold without using the auction method.
+* The number of properties that were passed in and sold afterward was slightly lower than the properties that were sold prior to the auction. However, this is the opposite for the total sales.
+* Less than 9% of all properties were sold at auction.
+* Less than 1% were sold after the auction took place and contributed to the total sales.
 
+We'll segregate the total sales by property type to determine the most popular method among different types of properties.
 
+### Total sales by type and selling method
+![method_sales_type](https://github.com/ksadangrit/melbourne-housing/assets/156267785/90f34d68-8998-4b54-b52d-d22877a013ee)
 
+* Even when separated by property type, common methods' rankings still mirror the overall sales trends.
+* The most popular method across all property types is non-auction sales, with significantly higher sales compared to other methods.
+* Selling after auctions is the least common method across all types.
+
+Next, we'll compare house prices with other factors to identify any trends or relationships between them
+
+### Price vs Distance
 
