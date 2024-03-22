@@ -1,0 +1,720 @@
+# Install packages
+install.packages("tidyverse")
+installed.packages("janitor")
+install.packages("scales")
+
+# Download libraries
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(dplyr)
+library(scales)
+
+# Import the csv file for the property data, clean column names, and trim whitespace from all columns
+melbourne_housing <- read_csv("/Users/yanhua1/Downloads/melbourne_property_sales.csv") %>%
+  clean_names() %>%
+  mutate_if(is.character, trimws)
+
+
+# Cleaning the data
+
+# Check how many rows there are in the melbourne_housing dataset
+nrow(melbourne_housing)
+
+# Check the column names and data structure
+colnames(melbourne_housing)
+str(melbourne_housing)
+
+
+# Check if there are any duplicate rows in the dataframe using if-else statement and duplicated() function
+if (any(duplicated(melbourne_housing))) {
+  print("There are duplicate rows in the dataframe.")
+} else {
+  print("All rows in the dataframe are unique.")
+}
+
+# Find out how many NA values there are for each column
+colSums(is.na(melbourne_housing))
+
+# Find out the name of the suburb that has the a missing value in the distance column
+na_row <- melbourne_housing %>%
+  filter(is.na(postcode))
+view(na_row) # To view the row in a separate window.
+
+# Find the missing values based on the suburb name by pulling other rows with the same suburb
+footscray_lot <- melbourne_housing %>%
+  filter(suburb == "Footscray Lot")
+view(footscray_lot)
+
+# Find the missing values for our row by filtering in all the rows that have Footscray suburb
+footscray <- melbourne_housing %>%
+  filter(suburb == "Footscray")
+view(footscray)
+
+# Update the row with the missing data using the mutate() function
+melbourne_housing <- melbourne_housing %>%
+  mutate(
+    suburb = ifelse(row_number() == 14441, "Footscray", suburb),
+    postcode = ifelse(row_number() == 14441, 3011, postcode),
+    regionname = ifelse(row_number() == 14441, "Western Metropolitan", regionname),
+    propertycount = ifelse(row_number() == 14441, 7570, propertycount)
+  )
+
+# Extract month and year from the date column using the lubridate package
+melbourne_housing_clean <- melbourne_housing %>%
+  mutate(
+    month = month(dmy(date)),
+    year = year(dmy(date))
+  ) %>%
+  mutate(
+    type = recode(type,
+      "u" = "Apartment/Unit",
+      "h" = "House",
+      "t" = "Townhouse"
+    ),
+    method = recode(method,
+      S = "property sold",
+      SP = "property sold prior",
+      PI = "property passed in",
+      VB = "vendor bid",
+      SA = "sold after auction"
+    )
+  ) %>%
+  select( # De-select columns that are not needed
+    -x1,
+    -postcode,
+    -car,
+    -landsize,
+    -building_area,
+    -council_area,
+    -year_built,
+    -bedroom2,
+    -bathroom,
+    -lattitude,
+    -longtitude
+  ) %>%
+  rename(seller = seller_g)
+
+# A look into the final melbourne_housing_clean data frame
+glimpse(melbourne_housing_clean)
+
+
+# --------------- Analysis ----------------
+# Find out max, min, avg, mean and sd based on types
+sum_table <- melbourne_housing_clean %>%
+  group_by(type) %>%
+  summarise(
+    max = comma(max(price)),
+    min = comma(min(price)),
+    avg = comma(mean(price)),
+    median = comma(median(price)),
+    sd = comma(sd(price))
+  )
+
+# The most common type of houses sold in Melbourne
+house_types <- melbourne_housing_clean %>%
+  group_by(type) %>%
+  summarise(
+    number = n(),
+    total_sales = sum(price)
+  )
+
+# Based on years
+house_types_year <- melbourne_housing_clean %>%
+  group_by(type, year) %>%
+  summarise(
+    number = n(),
+    total_sales = sum(price)
+  )
+
+
+# ------ Yearly -----
+# Total number of properties sold and total sales per year
+sales_year <- melbourne_housing_clean %>%
+  group_by(year) %>%
+  summarise(
+    number_sold = n(),
+    total_sales = sum(price)
+  )
+
+# Find out what are the median and avg prices for different types of properties sold each year
+sum_per_year <- melbourne_housing_clean %>%
+  group_by(type, year) %>%
+  summarise(
+    median_price = median(price),
+    avg_price = mean(price)
+  )
+
+# ----- Monthly ------
+# Total number of properties sold and total sales per month
+sales_month <- melbourne_housing_clean %>%
+  group_by(month) %>%
+  summarise(
+    number_sold = n(),
+    total_sales = sum(price)
+  )
+
+# Find out the sales for each month separated by type
+sales_month_type <- melbourne_housing_clean %>%
+  group_by(type, month) %>%
+  summarise(total_sales = sum(price))
+
+# ------ Suburbs ------
+# ------ Houses ------
+# Top 10 suburbs with the highest house prices
+avg_house <- melbourne_housing_clean %>%
+  group_by(suburb) %>%
+  filter(type == "House") %>%
+  summarise(avg_price = mean(price)) %>%
+  arrange(desc(avg_price)) %>%
+  head(10)
+
+# ------ Apartments ------
+# Top 10 suburbs with the highest apartment prices
+avg_apartment <- melbourne_housing_clean %>%
+  group_by(suburb) %>%
+  filter(type == "Apartment/Unit") %>%
+  summarise(avg_price = mean(price)) %>%
+  arrange(desc(avg_price)) %>%
+  head(10)
+
+# ------ Townhouses ------
+# Top 10 suburbs with the highest townhouse prices
+avg_townhouse <- melbourne_housing_clean %>%
+  group_by(suburb) %>%
+  filter(type == "Townhouse") %>%
+  summarise(avg_price = mean(price)) %>%
+  arrange(desc(avg_price)) %>%
+  head(10)
+
+# ------ Region ------
+# Total number of properties sold and total sales based on regions (how many and how much)
+region_sales <- melbourne_housing_clean %>%
+  group_by(regionname) %>%
+  summarise(
+    number_sold = n(),
+    total_sales = sum(price)
+  ) %>%
+  arrange(desc(total_sales))
+
+# Average property price by type and region
+avg_region <- melbourne_housing_clean %>%
+  group_by(regionname, type) %>%
+  summarise(avg_price = mean(price))
+
+# ------ Sellers ------
+# Top 5 sellers based on overall sales
+sales_seller <- melbourne_housing_clean %>%
+  group_by(seller) %>%
+  summarise(total_sales = sum(price)) %>%
+  arrange(desc(total_sales)) %>%
+  head(5)
+
+# Top 5 based on overall number of properties sold
+num_seller <- melbourne_housing_clean %>%
+  group_by(seller) %>%
+  summarise(number_sold = n()) %>%
+  arrange(desc(number_sold)) %>%
+  head(5)
+
+
+# Top 5 sellers in selling houses
+top_sellers_house <- melbourne_housing_clean %>%
+  group_by(seller) %>%
+  filter(type == "House") %>%
+  summarise(
+    number_sold = n(),
+    total_sales = sum(price)
+  ) %>%
+  arrange(desc(total_sales)) %>%
+  head(5)
+
+# Top 5 sellers in selling apartments
+top_sellers_apartment <- melbourne_housing_clean %>%
+  group_by(seller) %>%
+  filter(type == "Apartment/Unit") %>%
+  summarise(
+    number_sold = n(),
+    total_sales = sum(price)
+  ) %>%
+  arrange(desc(total_sales)) %>%
+  head(5)
+
+# Top 5 sellers in selling townhouse
+top_sellers_townhouse <- melbourne_housing_clean %>%
+  group_by(seller) %>%
+  filter(type == "Townhouse") %>%
+  summarise(
+    number_sold = n(),
+    total_sales = sum(price)
+  ) %>%
+  arrange(desc(total_sales)) %>%
+  head(5)
+
+
+# ------ Method ------
+# Most common selling method based on sales
+method_sales <- melbourne_housing_clean %>%
+  group_by(method) %>%
+  summarise(
+    number_sold = n(),
+    total_sales = sum(price)
+  )
+
+# Most common selling method by property type
+method_sales2 <- melbourne_housing_clean %>%
+  group_by(method, type) %>%
+  summarise(
+    number = n(),
+    total_sales = sum(price)
+  )
+
+# ------ Property count ------
+# Dataframe for the total number of houses sold and total number of existing properties in each suburb
+count_suburb <- melbourne_housing_clean %>%
+  group_by(suburb, propertycount) %>%
+  count() %>%
+  rename(total = n) %>%
+  arrange(desc(total))
+
+# ------ Rooms ------
+# How many rooms do people prefer when buying a house based on number of property sold?
+rooms <- melbourne_housing_clean %>%
+  mutate(condition = case_when(
+    rooms <= 3 ~ "1-3 rooms",
+    rooms > 3 & rooms <= 6 ~ "3-6 rooms",
+    rooms > 6 & rooms <= 9 ~ "6-9 rooms",
+    rooms > 9 ~ "more than 9 rooms",
+    TRUE ~ "Other"
+  )) %>%
+  group_by(condition) %>%
+  summarise(
+    count = n(),
+    percentage = round((n() / nrow(melbourne_housing_clean)) * 100, 2)
+  )
+
+
+# --------------- Visualisations ---------------
+# Install the RColorBrewer package
+install.packages("RColorBrewer")
+library(RColorBrewer)
+
+# ------ Yearly ------
+# Sales for each year
+ggplot(sales_year) +
+  geom_col(mapping = aes(x = year, y = total_sales, fill = factor(year))) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_x_discrete(breaks = unique(sales_year$year)) +
+  geom_text(
+    aes(
+      x = year, y = total_sales,
+      label = comma(total_sales)
+    ),
+    position = position_nudge(y = 0.03 * max(sales_year$total_sales)),
+    size = 3.5
+  ) +
+  labs(x = "Year", y = "Total sales (AU$)", fill = "Year") +
+  ggtitle("Melbourne: House sales for each year")
+
+# Total houses sold for each year
+ggplot(sales_year) +
+  geom_col(mapping = aes(x = year, y = number_sold, fill = factor(year))) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_x_discrete(breaks = unique(sales_year$year)) +
+  geom_text(
+    aes(
+      x = year, y = number_sold,
+      label = comma(number_sold)
+    ),
+    position = position_nudge(y = 0.03 * max(sales_year$number_sold)),
+    size = 3.5
+  ) +
+  labs(x = "Year", y = "Total number", fill = "Year") +
+  ggtitle("Melbourne: Total houses sold for each year")
+
+
+# Most common type of housing in Melbourne based on sales
+ggplot(house_types, aes(x = type, y = total_sales, fill = type)) +
+  geom_col() +
+  geom_text(aes(label = paste0(comma(total_sales), " (", round(total_sales / sum(total_sales) * 100), "%)")),
+    position = position_stack(vjust = 1.1)
+  ) +
+  scale_y_continuous(labels = scales::comma_format()) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(x = "Type", y = "Total sales (AU$)", fill = "Type") +
+  ggtitle("Most common types of houses based on sales")
+
+
+# Most common type of housing in Melbourne based on total houses sold
+ggplot(house_types, aes(x = type, y = number, fill = type)) +
+  geom_col() +
+  geom_text(aes(label = paste0(comma(number), " (", round(total_sales / sum(total_sales) * 100), "%)")),
+    position = position_nudge(y = 0.03 * max(house_types$number)),
+    size = 3.5
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(x = "Type", y = "Total number sold", fill = "Type") +
+  ggtitle("Most common types of houses based on total number sold")
+
+# Based on sales and years
+ggplot(house_types_year) +
+  geom_col(mapping = aes(x = type, y = total_sales, fill = type)) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_fill_brewer(palette = "Set2") +
+  geom_text(
+    aes(
+      x = type, y = total_sales,
+      label = comma(total_sales)
+    ),
+    position = position_nudge(y = 0.03 * max(house_types$total_sales)),
+    size = 3.5
+  ) +
+  facet_wrap(~year) +
+  labs(x = "Type", y = "Total sales (AU$)", fill = "Type") +
+  ggtitle("Most common types of houses based on sales")
+
+# Median house price
+ggplot(sum_per_year) +
+  geom_col(mapping = aes(x = type, y = median_price, fill = type)) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_fill_brewer(palette = "Set2") +
+  geom_text(
+    aes(
+      x = type, y = median_price,
+      label = comma(median_price)
+    ),
+    position = position_nudge(y = 0.03 * max(sum_per_year$median_price)),
+    size = 3.5
+  ) +
+  facet_wrap(~year) +
+  labs(x = "Type", y = "Median price (AU$)", fill = "Type") +
+  ggtitle("Melbourne: Median house price")
+
+# Average house price
+ggplot(sum_per_year) +
+  geom_col(mapping = aes(x = type, y = avg_price, fill = type)) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_fill_brewer(palette = "Set2") +
+  geom_text(
+    aes(
+      x = type, y = avg_price,
+      label = comma(avg_price)
+    ),
+    position = position_nudge(y = 0.03 * max(sum_per_year$avg_price)),
+    size = 3.5
+  ) +
+  facet_wrap(~year) +
+  labs(x = "Type", y = "Average price (AU$)", fill = "Type") +
+  ggtitle("Melbourne: Average house price")
+
+# ------ Monthly ------
+# Sales by month
+ggplot(data = sales_month, mapping = aes(x = month, y = total_sales)) +
+  geom_line(color = "palevioletred") +
+  geom_point(size = 1, color = "palevioletred4") +
+  scale_x_continuous(breaks = 1:12, labels = month.abb[1:12]) +
+  scale_y_continuous(labels = comma_format()) +
+  labs(y = "Total sales (AU$)", x = "Month") +
+  ggtitle("Melbourne: sales by month") +
+  geom_text(
+    data = rbind(sales_month[which.min(sales_month$total_sales), ], sales_month[which.max(sales_month$total_sales), ]),
+    aes(x = month, y = total_sales, label = comma(total_sales)), # Apply comma formatting to label
+    nudge_x = 0.7
+  )
+
+# Sales by month and type
+ggplot() +
+  geom_line(data = sales_month_type, aes(x = month, y = total_sales, color = type, group = type)) +
+  geom_point(data = sales_month_type, aes(x = month, y = total_sales, color = type), size = 1) +
+  scale_x_continuous(breaks = 1:12, labels = month.abb[1:12]) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_color_manual(values = c("House" = "blue", "Apartment/Unit" = "red", "Townhouse" = "green")) +
+  labs(x = "Month", y = "Total sales (AU$)", color = "Type of property") +
+  ggtitle("Melbourne: Sales by month and type")
+
+
+# Number of houses sold by month and type
+ggplot() +
+  geom_line(data = num_sold_month, aes(x = month, y = number_sold, color = type, group = type)) +
+  geom_point(data = num_sold_month, aes(x = month, y = number_sold, color = type), size = 1) +
+  scale_x_continuous(breaks = 1:12, labels = month.abb[1:12]) +
+  scale_color_manual(values = c("House" = "blue", "Apartment/Unit" = "red", "Townhouse" = "green")) +
+  labs(x = "Month", y = "Total number of houses sold", color = "Type of property") +
+  ggtitle("Melbourne: Total number of houses sold by month and type")
+
+# ------ Suburb ------
+# ------ House ------
+# Top 10 suburbs with the highest average house price
+ggplot(avg_house) +
+  geom_col(mapping = aes(x = reorder(suburb, avg_price), y = avg_price, fill = suburb)) +
+  scale_y_continuous(labels = scales::comma) +
+  geom_text(
+    aes(
+      x = suburb, y = avg_price,
+      label = comma(avg_price)
+    ),
+    position = position_nudge(y = -0.05 * max(avg_house$avg_price)),
+    size = 3.5
+  ) +
+  labs(x = "Suburb", y = "Average price (AU$)", fill = "Suburb") +
+  ggtitle("Top 10 suburbs with the highest average house price") +
+  coord_flip() +
+  theme_minimal()
+
+# ------ Apartment ------
+# Top 10 suburbs with the highest average apartment price
+ggplot(avg_apartment) +
+  geom_col(mapping = aes(x = reorder(suburb, avg_price), y = avg_price, fill = suburb)) +
+  scale_y_continuous(labels = scales::comma) +
+  geom_text(
+    aes(
+      x = suburb, y = avg_price,
+      label = comma(avg_price)
+    ),
+    position = position_nudge(y = -0.05 * max(avg_apartment$avg_price)),
+    size = 3.5
+  ) +
+  labs(x = "Suburb", y = "Average price (AU$)", fill = "Suburb") +
+  ggtitle("Top 10 suburbs with the highest average apartment/unit price") +
+  coord_flip() +
+  theme_minimal()
+
+# ------ Townhouse ------
+# Top 10 suburbs with the highest average townhouse price
+ggplot(avg_townhouse) +
+  geom_col(mapping = aes(x = reorder(suburb, avg_price), y = avg_price, fill = suburb)) +
+  scale_y_continuous(labels = scales::comma) +
+  geom_text(
+    aes(
+      x = suburb, y = avg_price,
+      label = comma(avg_price)
+    ),
+    position = position_nudge(y = -0.05 * max(avg_townhouse$avg_price)),
+    size = 3.5
+  ) +
+  labs(x = "Suburb", y = "Average price (AU$)", fill = "Suburb") +
+  ggtitle("Top 10 suburbs with the highest average townhouse price") +
+  coord_flip() +
+  theme_minimal()
+
+# ------ Region ------
+# Sales by region
+ggplot(data = region_sales, mapping = aes(x = regionname, y = total_sales, group = 1)) +
+  geom_line(color = "lightsalmon") +
+  geom_point(size = 1, color = "lightsalmon4") +
+  scale_y_continuous(labels = comma_format()) +
+  labs(y = "Total sales (AU$)", x = "Region") +
+  ggtitle("Melbourne: sales by region") +
+  geom_text(
+    data = rbind(region_sales[which.min(region_sales$total_sales), ], region_sales[which.max(region_sales$total_sales), ]),
+    aes(x = regionname, y = total_sales, label = comma(total_sales)), # Apply comma formatting to label
+    nudge_x = -0.5
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Average house price by region
+ggplot() +
+  geom_line(data = avg_region, aes(x = regionname, y = avg_price, color = type, group = type)) +
+  geom_point(data = avg_region, aes(x = regionname, y = avg_price, color = type), size = 1) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_color_manual(values = c("House" = "blue", "Apartment/Unit" = "red", "Townhouse" = "green")) +
+  labs(x = "Region", y = "Average Price (AU$)", color = "Type of property") +
+  ggtitle("Melbourne: Avergae house price by region") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# ------ Sellers ------
+# Top 5 sellers with the highest sales
+ggplot(sales_seller) +
+  geom_col(mapping = aes(x = reorder(seller, total_sales), y = total_sales, fill = seller)) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c(
+    "Jellis" = "skyblue3",
+    "Nelson" = "orchid2",
+    "Marshall" = "limegreen",
+    "hockingstuart" = "purple",
+    "Barry" = "salmon2"
+  )) +
+  geom_text(
+    aes(
+      x = seller, y = total_sales,
+      label = comma(total_sales)
+    ),
+    position = position_nudge(y = -0.1 * max(sales_seller$total_sales)),
+    size = 3.5
+  ) +
+  labs(x = "Real estate agent/ company", y = "Total Sales (AU$)", fill = "Real estate agent/ company") +
+  ggtitle("Top 5 real estate agent/company with the highest sales") +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Top 5 sellers based on total houses sold
+ggplot(num_seller) +
+  geom_col(mapping = aes(x = reorder(seller, number_sold), y = number_sold, fill = seller)) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c(
+    "Jellis" = "skyblue3",
+    "Nelson" = "orchid2",
+    "Ray" = "yellowgreen",
+    "hockingstuart" = "purple",
+    "Barry" = "salmon2"
+  )) +
+  geom_text(
+    aes(
+      x = seller, y = number_sold,
+      label = comma(number_sold)
+    ),
+    position = position_nudge(y = -0.05 * max(num_seller$number_sold)),
+    size = 3.5
+  ) +
+  labs(x = "Real estate agent/ company", y = "Number of properties sold", fill = "Real estate agent/ company") +
+  ggtitle("Top 5 real estate agent/company based on total properties sold") +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# For house based on sales
+ggplot(top_sellers_house) +
+  geom_col(mapping = aes(x = reorder(seller, total_sales), y = total_sales, fill = seller)) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c(
+    "Jellis" = "skyblue3",
+    "Nelson" = "orchid2",
+    "Marshall" = "limegreen",
+    "hockingstuart" = "purple",
+    "Barry" = "salmon2"
+  )) +
+  geom_text(
+    aes(
+      x = seller, y = total_sales,
+      label = comma(total_sales)
+    ),
+    position = position_nudge(y = -0.1 * max(top_sellers_house$total_sales)),
+    size = 3.5
+  ) +
+  labs(x = "Real estate agent/ company", y = "Total Sales (AU$)", fill = "Real estate agent/ company") +
+  ggtitle("Top 5 real estate agent/company with the highest sales for house") +
+  coord_flip() +
+  theme_minimal()
+
+# For apartment based on sales
+ggplot(top_sellers_apartment) +
+  geom_col(mapping = aes(x = reorder(seller, total_sales), y = total_sales, fill = seller)) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c(
+    "Jellis" = "skyblue3",
+    "Nelson" = "orchid2",
+    "Marshall" = "limegreen",
+    "hockingstuart" = "purple",
+    "Buxton" = "yellow3"
+  )) +
+  geom_text(
+    aes(
+      x = seller, y = total_sales,
+      label = comma(total_sales)
+    ),
+    position = position_nudge(y = -0.1 * max(top_sellers_apartment$total_sales)),
+    size = 3.5
+  ) +
+  labs(x = "Real estate agent/ company", y = "Total Sales (AU$)", fill = "Real estate agent/ company") +
+  ggtitle("Top 5 real estate agent/company with the highest sales for apartment") +
+  coord_flip() +
+  theme_minimal()
+
+# For townhouse based on sales
+ggplot(top_sellers_townhouse) +
+  geom_col(mapping = aes(x = reorder(seller, total_sales), y = total_sales, fill = seller)) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c(
+    "Jellis" = "skyblue3",
+    "Nelson" = "orchid2",
+    "Buxton" = "yellow3",
+    "hockingstuart" = "purple",
+    "Barry" = "salmon2"
+  )) +
+  geom_text(
+    aes(
+      x = seller, y = total_sales,
+      label = comma(total_sales)
+    ),
+    position = position_nudge(y = -0.1 * max(top_sellers_townhouse$total_sales)),
+    size = 3.5
+  ) +
+  labs(x = "Real estate agent/ company", y = "Total Sales (AU$)", fill = "Real estate agent/ company") +
+  ggtitle("Top 5 real estate agent/company with the highest sales for townhouse") +
+  coord_flip() +
+  theme_minimal()
+
+
+# ------ Method ------
+# Total sales by selling method
+ggplot(method_sales) +
+  geom_col(mapping = aes(x = method, y = total_sales, fill = method)) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_brewer(palette = "Dark2") +
+  geom_text(
+    aes(
+      x = method, y = total_sales,
+      label = comma(total_sales)
+    ),
+    position = position_nudge(y = 0.02 * max(method_sales$total_sales)),
+    size = 3.5
+  ) +
+  labs(x = "Method of selling", y = "Total sales (AU$)", fill = "Method of selling") +
+  ggtitle("Total sales by selling method") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Total number of properties sold by selling method
+ggplot(method_sales) +
+  geom_col(mapping = aes(x = method, y = number_sold, fill = method)) +
+  geom_text(
+    aes(
+      x = method, y = number_sold,
+      label = paste0(comma(number_sold), " (", round(number_sold / sum(number_sold) * 100, 2), "%)")
+    ),
+    position = position_nudge(y = 0.03 * max(method_sales$number_sold)),
+    size = 3.5
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(x = "Method of selling", y = "Total number", fill = "Method of selling") +
+  ggtitle("Total number of properties sold by selling method") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+# Total sales by property type and selling method
+ggplot() +
+  geom_line(data = method_sales2, aes(x = method, y = total_sales, color = type, group = type)) +
+  geom_point(data = method_sales2, aes(x = method, y = total_sales, color = type), size = 1) +
+  scale_y_continuous(labels = comma_format()) +
+  scale_color_manual(values = c("House" = "blue", "Apartment/Unit" = "red", "Townhouse" = "green")) +
+  labs(x = "Method", y = "Total sales (AU$)", color = "Type of property") +
+  ggtitle("Melbourne: Total sales by property type and selling method")
+
+
+# ------ Compare price and other factors ------
+# Price vs Distance
+ggplot(data = melbourne_housing_clean, aes(x = distance, y = price)) +
+  scale_y_continuous(labels = scales::comma) +
+  geom_point(color = "turquoise") +
+  geom_point(data = melbourne_housing_clean[which.min(melbourne_housing_clean$price), ], color = "blue", size = 3) +
+  geom_point(data = melbourne_housing_clean[which.max(melbourne_housing_clean$price), ], color = "red", size = 3) +
+  ggtitle("Melbourne: House price vs Distance") +
+  labs(x = "Distance to CBD in kilometers", y = "Price (AU$)")
+
+# Price vs Number of Room
+ggplot(data = melbourne_housing_clean, aes(x = rooms, y = price)) +
+  scale_y_continuous(labels = scales::comma) +
+  geom_point(color = "lightsalmon") +
+  geom_point(data = melbourne_housing_clean[which.min(melbourne_housing_clean$price), ], color = "blue", size = 3) +
+  geom_point(data = melbourne_housing_clean[which.max(melbourne_housing_clean$price), ], color = "red", size = 3) +
+  ggtitle("Melbourne: House price vs Number of rooms") +
+  labs(x = "Number of rooms", y = "Price (AU$)")
+
+# Property count vs total number of houses sold
+ggplot(data = count_suburb, aes(x = propertycount, y = total)) +
+  geom_point(color = "purple") +
+  geom_point(data = count_suburb[which.min(count_suburb$total), ], color = "blue", size = 3) +
+  geom_point(data = count_suburb[which.max(count_suburb$total), ], color = "red", size = 3) +
+  ggtitle("Melbourne: Property count vs Total number of houses sold") +
+  labs(x = "Number of properties that exist in the same suburb", y = "Total number of properties sold")
