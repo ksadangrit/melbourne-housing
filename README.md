@@ -58,12 +58,6 @@ For full dictionary click [here](https://www.kaggle.com/datasets/amalab182/prope
 * `distance`: Distance from the property to Melbourne central business district (CBD) in kilometers
 * `regionname`: Name of the region where the property is located (e.g., Eastern Metropolitan, Northern Metropolitan, Southern Metropolitan, Western Metropolitan)
 * `propertycount`: Number of properties that exist in the suburb
-* `bedroom`: Number of bedrooms in the property (including any non-living spaces that could be used as bedrooms)
-* `bathroom`: Number of bathrooms in the property
-* `car`: Number of car spaces associated with the property
-* `landsize`: Land size of the property in square meters
-* `building_area`: Total building area of the property in square meters
-* `council_area`: Name of the local government area where the property is located
 
 
 ## Cleaning data
@@ -139,7 +133,8 @@ melbourne_housing <- melbourne_housing %>%
 ```
 The other columns contain specific missing values which we cannot obtain based on the suburb names. 
 
-Next, we'll extract month and year from the date column deselect the columns that are not needed such as longtitude, latitude and the id. Well also rename some variables and columns to make them more readable. We'll name the clean dataset as `melbourne_housing_clean`.
+Next, we'll extract the month and year from the date column and deselect any unnecessary columns, as well as those with over 18% of missing data. Since the missing data for each house is unique and cannot be inferred, analysis involving columns with missing data may lead to biased and inaccurate findings. Additionally, we'll rename the `seller_g` column to `seller` for improved readability. Finally, we'll name the cleaned dataset as `melbourne_housing_clean`.
+
 ```
 melbourne_housing_clean <- melbourne_housing %>%
   mutate(month = month(dmy(date)),
@@ -156,11 +151,18 @@ melbourne_housing_clean <- melbourne_housing %>%
                          SA = "sold after auction")) %>% 
   select(       # De-select columns that are not needed
     -x1,
+    -postcode,
+    -car,
+    -landsize,
+    -building_area,
+    -council_area,
+    -year_built,
+    -bedroom2,
+    -bathroom,
     -lattitude,
     -longtitude
       ) %>% 
-  rename(bedroom = bedroom2,
-         seller = seller_g) 
+  rename(seller = seller_g) 
 ```
 
 A look into the clean dataset.
@@ -212,7 +214,7 @@ house_types_year <- melbourne_housing_clean %>%
 ### Yearly
 We will employ various time measurements to analyze the sales data. To begin, we'll determine the total number of property sales and the number of properties sold in each year using the code provided below.
 
-**Total sales and number of properties sold**
+#### Total sales and number of properties sold
 ```
 sales_year <- melbourne_housing_clean %>% 
   group_by(year) %>% 
@@ -222,7 +224,7 @@ sales_year <- melbourne_housing_clean %>%
 
 In the previous part, we found the average and middle prices for each property type. Now, we'll split the data by year and compare how the average and middle prices differ. This comparison will help us understand how the data is spread out. We'll use this information for our next step in visualizing the data.
 
-**Average and Median price**
+#### Average and Median price
 ```
 sum_per_year <- melbourne_housing_clean %>% 
   group_by(type, year) %>% 
@@ -232,17 +234,10 @@ sum_per_year <- melbourne_housing_clean %>%
 
 ### Monthly
 We'll check out the total number of property sales and the number of properties sold in a monthly basis.
-```
-# Total number of properties sold and total sales per month 
-sales_month <- melbourne_housing_clean %>% 
-  group_by(month) %>% 
-  summarise(number_sold = n(),
-            total_sales = sum(price)) 
-```
 
 Instead of calculating the median house price for each month, we'll compare the **total sales** for each month. Since months represent a shorter time scale compared to years, variations in median house prices for each month may be influenced by factors such as housing market availability. Therefore, focusing on total sales can offer valuable insights into fluctuations in housing demand throughout the year.
 
-**Total sales and number of properties sold**
+#### Total sales and number of properties sold
 ```
 sales_month <- melbourne_housing_clean %>% 
   group_by(month) %>% 
@@ -250,7 +245,7 @@ sales_month <- melbourne_housing_clean %>%
             total_sales = sum(price)) 
 ```
 
-**Total sales separated by types**
+#### Total sales separated by types
 ```
 sales_month_type <- melbourne_housing_clean %>% 
   group_by(type, month) %>% 
@@ -311,9 +306,6 @@ avg_region <- melbourne_housing_clean %>%
   group_by(regionname, type) %>% 
   summarise(avg_price = mean(price)) 
 ```
-
-_**Note**: I won't be analyzing the council area as a factor because a large portion of the data is missing, with 33% of the dataset lacking information. This could affect the accuracy of the analysis. Additionally, analyzing the council area is unlikely to yield significant insights insights for those interested in the property market._
-
 
 ### Sellers
 We'll initially rank all real estate agents or companies based on their overall sales performance and find out who are in the top 5. Then, we'll further rank them based on the total sales they made for each type of property.
@@ -423,7 +415,7 @@ Based on the results, houses with 1 to 3 rooms were the most common, making up o
 ## Visualising the findings
 For this part of the project, I will not include the codes used for creating visualisations but the full codes can be accessed in the melbourne_housing_complete.R file under the same repository. 
 
-## Yearly
+### Yearly
 #### Total sales each year and total number sold
 | Total sales                           | Number of properties sold                       |
 | ------------------------------------- | ----------------------------------------------- |
@@ -432,7 +424,7 @@ For this part of the project, I will not include the codes used for creating vis
 In 2017, sales outperformed 2016 by over 2 billion dollars. When examining the total number of houses sold each year, this bar chart provides further clarity on why 2017 outperformed 2016 in terms of sales. With over 2000 more properties sold in 2017 compared to 2016, it's logical that the sales figures would also be higher.
 
 ### Yearly and type
-### Most common type of houses based on sales and total number
+#### Most common type of houses based on sales and total number
 | Total sales                           | Number of properties sold                       |
 | ------------------------------------- | ----------------------------------------------- |
 | ![sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/ae3b4ddb-0c19-4939-bf2f-01c4d4016674)| ![total](https://github.com/ksadangrit/melbourne-housing/assets/156267785/04ea5402-8fcf-4639-8135-fa2d8ff1bc65) |
@@ -440,7 +432,7 @@ In 2017, sales outperformed 2016 by over 2 billion dollars. When examining the t
 
 In Melbourne during 2016-2017, houses were the most commonly sold property type, making up about 77% of total sales and total number of properties sold. Apartments/units followed at 14%, and townhouses at 10%. The number of houses sold was nearly double that of apartments/units and townhouses combined.
 
-### Based on sales separated by year
+#### Based on sales separated by year
 Now, we'll break down the total sales by year to observe any changes in the trend.
 
 ![type_sales_year](https://github.com/ksadangrit/melbourne-housing/assets/156267785/f727991d-7141-4675-99d1-4627bb01343b)
@@ -457,13 +449,13 @@ The trend persists even after separating the total sales by year, with houses re
 * Average prices were generally higher in 2016 compared to 2017 across all property types.
 * The difference between average and median values was largest for houses, followed by townhouses and apartment/units.
 
-## Monthly
-**Sales by month**
+### Monthly
+#### Sales by month
 ![sales_month](https://github.com/ksadangrit/melbourne-housing/assets/156267785/58c07d3e-73d8-440d-9ab3-7d5b69a3da25)
 
 The sales of houses showed a consistent pattern of being generally high from April to September. Total sales across all properties reached their lowest point in January. From January onwards, sales gradually increased, with the highest sales volume occurring in September, totaling around $3.4 billion. However, there was a significant drop in sales between September and October, with a difference of almost $2 billion.
 
-**Sales and Total number seperated by type and month**
+#### Sales and Total number seperated by type and month
 
 Now, we'll compare the total number of houses sold and the total sales for each month of the year, categorized by property type.
 ![sales_month_type](https://github.com/ksadangrit/melbourne-housing/assets/156267785/4caacc1f-c6b7-496b-8f5f-b09a35b2b0ac)
@@ -475,31 +467,31 @@ Now, we'll compare the total number of houses sold and the total sales for each 
 * September stands out as the month with the highest sales and total number of properties sold across all property types.
 * However, houses show more pronounced fluctuations in sales, with distinct peaks and troughs, while apartments and townhouses exhibit similar but less dramatic changes over time.
 
-## Suburbs
+### Suburbs
 In this section, we'll identify and rank the top 10 different types of properties based on their average prices.
 
-### Top 10 suburbs for House
+#### Top 10 suburbs for House
 ![top_suburb_house](https://github.com/ksadangrit/melbourne-housing/assets/156267785/e6ed559b-5226-4b73-92e5-ec8ab192f522)
 
-### Top 10 suburbs for Apartment/ Unit
+#### Top 10 suburbs for Apartment/ Unit
 ![top_council_apartment](https://github.com/ksadangrit/melbourne-housing/assets/156267785/328a97a0-eb63-41b2-9f3d-6e21399520d8)
 
-### Top 10 suburbs for Townhouse
+#### Top 10 suburbs for Townhouse
 ![top_council_townhouse](https://github.com/ksadangrit/melbourne-housing/assets/156267785/7e069112-d219-431c-997e-659fde467afc)
 
 * None of the suburbs listed for houses appear on the top 10 list for apartments or townhouses. Notably, even the lowest average house price among these suburbs exceeds the highest average price for other property types.
 * Bayside ranks first for both apartments and townhouses. Furthermore, all suburbs listed for apartments also appear on the townhouse list.
 * Manningham, Melbourne, Whitehorse, and Monash rank higher for apartments but lower for townhouses. Conversely, suburbs ranking higher for townhouses include Stonington, Boroondara, Port Phillip, Yarra, and Glen Eira. Additionally, the average apartment prices across all suburbs are generally lower than the average prices for townhouses in the same suburbs.
 
-## Regions 
-### Sales by region
+### Regions 
+#### Sales by region
 ![sales_region](https://github.com/ksadangrit/melbourne-housing/assets/156267785/8e0e1391-c4be-4d6e-944f-5a84cfecf1c9)
 
 * Metropolitan regions generally have large total sales, with Southern Metropolitan topping the list at over $8.6 billion, followed by Northern Metropolitan and Western Metropolitan.
 * The Victoria region had the lowest sales overall, with Western Victoria recording the lowest sales of around $16.5 million.
 * Among the Metropolitan regions, South-Eastern Metropolitan was the only one with less than $1 billion in sales.
 
-### Average house price by region
+#### Average house price by region
 Now, let's examine the average house prices for different regions based on property types.
 ![avg_region](https://github.com/ksadangrit/melbourne-housing/assets/156267785/b2f962f1-1191-4101-a9f0-4ee9c1e01824)
 
@@ -509,7 +501,7 @@ Now, let's examine the average house prices for different regions based on prope
 * Interestingly, Eastern outperforms Northern Metropolitan to become the region with the second-highest average property prices.
 * There is a more significant disparity in average house prices across different regions compared to apartments and townhouses, as evidenced by Southern Metropolitan having an average house price more than three times higher than that of Western Victoria.
 
-## Sellers
+### Sellers
 We'll begin by ranking the top 5 sellers across all types of properties based on sales and the number of properties sold to explore their relationships and differences.
 | Total sales                           | Number of properties sold                       |
 | --------------------------------------------- | --------------------------------------------- |
@@ -524,13 +516,13 @@ We'll begin by ranking the top 5 sellers across all types of properties based on
 
 Next, we'll examine the top 5 sellers with the highest sales for different types of properties to determine if any sellers dominate the Melbourne housing market or specialize in certain types of properties.
 
-### Top 5 sellers for House
+#### Top 5 sellers for House
 ![seller_house](https://github.com/ksadangrit/melbourne-housing/assets/156267785/406b73e5-0440-487c-a367-3f65001b8b43)
 
-### Top 5 Sellers for Apartment/ Unit
+#### Top 5 Sellers for Apartment/ Unit
 ![seller_apartment](https://github.com/ksadangrit/melbourne-housing/assets/156267785/9e4252ff-24de-40ad-b2d3-435a56035207)
 
-### Top 5 sellers for Townhouse
+#### Top 5 sellers for Townhouse
 ![seller_townhouse](https://github.com/ksadangrit/melbourne-housing/assets/156267785/fdca9aea-87ed-45e5-a72a-bacadd74f516)
 
 * The top 5 sellers for houses closely resemble the list of top 5 sellers for total sales we previously discussed, indicating that house sales significantly contribute to the overall ranking.
@@ -539,7 +531,7 @@ Next, we'll examine the top 5 sellers with the highest sales for different types
 * Barry, Buxton, and Marshall are among the top 5 sellers for 2 out of 3 types of properties, while Jellis, Nelson, and Hockingstuart are the top sellers for all types.
 * The total sales from the top-ranked seller for apartments and townhouses are still lower than the total sales made by the rank 5 seller for houses.
 
-## Method
+### Method
 | Total sales                           | Number of properties sold                       |
 | --------------------------------------------- | --------------------------------------------- |
 | ![method_sales](https://github.com/ksadangrit/melbourne-housing/assets/156267785/71be72dc-fe3f-44ea-9c83-6c2da4a755ee) | ![method_total](https://github.com/ksadangrit/melbourne-housing/assets/156267785/0ed4aa86-6f5e-4dff-b7b5-c787e07ffde7)|
@@ -551,7 +543,7 @@ Next, we'll examine the top 5 sellers with the highest sales for different types
 
 We'll segregate the total sales by property type to determine the most popular method among different types of properties.
 
-### Total sales by type and selling method
+#### Total sales by type and selling method
 ![method_sales_type](https://github.com/ksadangrit/melbourne-housing/assets/156267785/90f34d68-8998-4b54-b52d-d22877a013ee)
 
 * Even when separated by property type, common methods' rankings still mirror the overall sales trends.
@@ -561,4 +553,50 @@ We'll segregate the total sales by property type to determine the most popular m
 Next, we'll compare house prices with other factors to identify any trends or relationships between them
 
 ### Price vs Distance
+![price vs distance](https://github.com/ksadangrit/melbourne-housing/assets/156267785/c23938d5-d290-4802-8145-d8414b11f874)
+
+* The graph shows a clustering of data where properties within 1-15km of the CBD are priced under $2 million.
+* As the distance from the CBD increases, the data becomes less clustered, suggesting a preference for properties closer to the city.
+* Properties sold for over $5 million are mostly within 15km of the CBD, except for one priced over $8 million located further away.
+* The graph suggests that proximity to the CBD influences buyer decisions, with more sales observed for houses closer to the city. This may be due to buyers' willingness to pay higher prices, resulting in increased property values for homes near the CBD.
+
+### Price vs Number of Rooms
+![price vs room](https://github.com/ksadangrit/melbourne-housing/assets/156267785/7d7d4a8d-d2c9-45fd-9725-68b65380235d)
+
+* Most houses have 1-5 bedrooms.
+* The cheapest house has 1 bedroom, while the most expensive has 3 bedrooms.
+* A few houses with over 7 bedrooms are priced under 4 million.
+* There isn't a clear relationship between the number of bedrooms and property prices. Despite houses worth over $5 million typically having 3-6 bedrooms, there are still houses with over 5 bedrooms priced below $5 million.
+
+### Property count vs Total number 
+Now, we'll explore whether there is a positive relationship between the number of properties existing in suburbs and the number of properties sold. Each dot on the graph represents a single suburb.
+![count vs total](https://github.com/ksadangrit/melbourne-housing/assets/156267785/a08ff764-8b09-4d2e-917b-8e2343aed6ad)
+
+* Most suburbs have fewer than 7000 properties and less than 200 properties sold.
+* Suburbs with over 10,000 existing properties show varying numbers of properties sold, ranging from 1 to over 400.
+* One suburb stands out with over 20,000 properties and over 500 properties sold, suggesting a potential positive correlation.
+* However, this correlation is not universally applicable across all suburbs upon closer examination of the overall data.
+
+## Key Findings and Insights
+* There are a few properties with large prices affecting the overall median of house prices.
+* The average in 2016 is around $1.1 million, 7% higher than 2017, but 16% lower than the median house price of the same year.
+* Average apartment prices for both years are under $870k, with higher prices in 2017.
+* For Townhouses, it's cheaper to buy in 2016, with an average price of $546k, 7% cheaper than in 2017.
+* Houses rank first for total sales and total number sold, followed by apartments and townhouses, consistently across all years.
+* Despite higher average and median prices for townhouses, more apartments were sold, possibly due to the availability of different property types on the market.
+* Sales and properties sold were higher in 2017 compared to 2016.
+* Most houses (75%) consist of 1-3 bedrooms, with fewer houses having higher room numbers.
+* May to September sees higher sales volume, with September having the highest sales across all types, while January has the lowest.
+* Toorak ranks as the top suburb for houses. None of the top suburbs on the houses list appear in the top 10 for apartments or townhouses. Bayside ranks first for both apartments and townhouses.
+* Southern Metropolis consistently has the highest average prices for all property types, while Eastern Victoria is the most affordable across the board.
+* Jellis and Nelson consistently rank as the top two sellers across all property types, except for townhouses, where Buxton surpasses Nelson to rank second.
+* Most houses were sold without involving auctions.
+* Buyers prefer houses closer to the city, as evidenced by higher sales volumes and prices.
+* There appears to be no clear relationship between house prices and the number of rooms, or between the number of properties sold and the existing properties in each suburb.
+
+## Recommendations
+* Investors should prioritize location-based strategies. Southern Metropolis offers higher prices for potential higher returns, while Eastern Victoria provides affordability. Proximity to city centers should also be considered for potential demand and appreciation, benefiting buyers and investors.
+* Buyers should strategically time purchases, particularly for townhouses, aiming for lower prices during downturns like in 2016 compared to 2017.
+* To gain a comprehensive understanding and better assess market dynamics, it'd be helpful to know the number of houses listed for sale. This data provides insights into demand trends, transaction flow, and overall market activity in Melbourne, aiding in informed decision-making for buyers, sellers, and investors alike.
+
 
