@@ -18,7 +18,11 @@ This property dataset had been extracted from Wikipage by Amal A Biju. Click [he
 Descriptive statistics and data visualization techniques will be used to explore the relationshop between housing prices and other factors. **R** is the tool that will be used for this analysis.
 
 ### My analytical workflow
-
+1. Importing data
+2. Cleaning the data
+3. Analysis
+4. Visualisation
+5. Key findings and recommendations
 
 ## Importing data
 We will download the dataset from [kaggle](https://www.kaggle.com/datasets/amalab182/property-salesmelbourne-city) ans save it into my computer file.
