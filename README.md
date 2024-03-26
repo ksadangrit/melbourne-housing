@@ -69,11 +69,8 @@ We'll start the cleaning step by checking how many rows there are in this datase
 ```
 nrow(melbourne_housing)
 ```
-
+There are 18396 rows in total.
 ```
-# Check how many rows there are in the melbourne_housing dataset
-nrow(melbourne_housing)
-
 # Check the column names and data structure
 colnames(melbourne_housing)
 str(melbourne_housing)
@@ -93,7 +90,7 @@ As we're confirmed that there is no duplicates, we'll run the below code to see 
 ```
 colSums(is.na(melbourne_housing))
 ```
-![Screen Shot 2024-03-08 at 1 49 47 PM](https://github.com/ksadangrit/melbourne-housing/assets/156267785/ffadf58f-6dbb-42d5-8248-ba33879ef17b)
+![Screen Shot 2024-03-27 at 11 46 43 AM](https://github.com/ksadangrit/melbourne-housing/assets/156267785/c8221215-4c7a-4850-ae9b-d4663fd8d0b3)
 
 After running the code, the result shows that the following columns do not have any missing values: suburb, address, rooms, type, price, method, seller_g. 
 
